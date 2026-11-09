@@ -2,7 +2,7 @@
 
 面向幼儿园小朋友的纯静态语音互动网页：点读、语音问答、儿歌、古诗、认知卡片。
 
-站点：https://alex-87-10.github.io/kid-speech-play/
+站点：https://chinahomeby.github.io/kid-speech-play/
 
 ## 能做什么
 
