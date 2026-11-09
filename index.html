@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>星星小屋 · 会说话的启蒙乐园</title>
+<meta name="description" content="面向幼儿园小朋友的语音互动启蒙网页：点读、儿歌、古诗、认知卡片，纯静态、无需登录。">
+<link rel="icon" type="image/svg+xml" href="assets/icon.svg">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<div class="sky" aria-hidden="true">
+  <div class="sky-glow"></div>
+  <div class="stars" id="stars"></div>
+  <div class="cloud cloud-a"></div>
+  <div class="cloud cloud-b"></div>
+  <div class="cloud cloud-c"></div>
+</div>
+
+<main class="app">
+  <header class="brand">
+    <div class="brand-mark" aria-hidden="true">
+      <svg viewBox="0 0 48 48" width="44" height="44" role="img">
+        <path d="M24 6l4.6 11.2 11.9 1.1-9 8 2.6 11.7-10.1-6-10.1 6L16.5 26.3l-9-8 11.9-1.1z" fill="#ffc93c"/>
+        <circle cx="24" cy="24" r="6.2" fill="#ff8a65"/>
+      </svg>
+    </div>
+    <div class="brand-text">
+      <h1>星星小屋</h1>
+      <p>点一点，说一说，一起玩</p>
+    </div>
+  </header>
+
+  <div class="controls" role="group" aria-label="声音设置">
+    <button class="ctl" id="soundBtn" type="button" aria-pressed="true">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M4 9h3l4-3.5v13L7 15H4z" fill="currentColor"/><path d="M15.5 8.5a5 5 0 010 7" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>
+      <span>音效</span>
+    </button>
+    <button class="ctl" id="voiceBtn" type="button" aria-pressed="true">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M3 10v4h3l4 3.5v-11L6 10z" fill="currentColor"/><path d="M14 9l6 6M20 9l-6 6" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>
+      <span>朗读</span>
+    </button>
+    <label class="rate">
+      <span>语速</span>
+      <input id="rate" type="range" min="0.6" max="1.2" step="0.05" value="0.9">
+    </label>
+  </div>
+
+  <nav class="tabs" role="tablist" aria-label="功能切换">
+    <button class="tab is-on" role="tab" aria-selected="true" data-page="talk" type="button">
+      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor"/><path d="M6 11a6 6 0 0012 0M12 17v4" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>
+      语音对话
+    </button>
+    <button class="tab" role="tab" aria-selected="false" data-page="song" type="button">
+      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M10 17V6l9-2v11" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/><circle cx="7.5" cy="17.5" r="2.5" fill="currentColor"/><circle cx="16.5" cy="15.5" r="2.5" fill="currentColor"/></svg>
+      儿歌乐园
+    </button>
+    <button class="tab" role="tab" aria-selected="false" data-page="poem" type="button">
+      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M5 4h9a3 3 0 013 3v13H8a3 3 0 01-3-3z" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M8 9h6M8 13h5" stroke="currentColor" stroke-width="1.6"/></svg>
+      诗词课堂
+    </button>
+    <button class="tab" role="tab" aria-selected="false" data-page="learn" type="button">
+      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="1.6" stroke="currentColor" stroke-width="1.8" fill="none"/><rect x="13" y="4" width="7" height="7" rx="1.6" stroke="currentColor" stroke-width="1.8" fill="none"/><rect x="4" y="13" width="7" height="7" rx="1.6" stroke="currentColor" stroke-width="1.8" fill="none"/><rect x="13" y="13" width="7" height="7" rx="1.6" stroke="currentColor" stroke-width="1.8" fill="none"/></svg>
+      认知启蒙
+    </button>
+  </nav>
+
+  <!-- ===== 语音对话 ===== -->
+  <section class="page is-on" id="page-talk" role="tabpanel" aria-label="语音对话">
+    <div class="talk-stage">
+      <button class="mic" id="micBtn" type="button" aria-label="开始说话">
+        <span class="mic-ring"></span>
+        <span class="mic-ring ring-2"></span>
+        <svg viewBox="0 0 24 24" width="46" height="46" aria-hidden="true"><rect x="9" y="2.5" width="6" height="11" rx="3" fill="#fff"/><path d="M5.8 11a6.2 6.2 0 0012.4 0M12 17.2V21" stroke="#fff" stroke-width="1.9" fill="none" stroke-linecap="round"/></svg>
+      </button>
+      <p class="mic-hint" id="micHint">按一下，然后对我说句话</p>
+    </div>
+
+    <div class="chat" id="chat" aria-live="polite"></div>
+
+    <div class="chips" aria-label="快捷提问">
+      <button class="chip" type="button" data-say="你好">你好呀</button>
+      <button class="chip" type="button" data-say="小猫怎么叫">小猫怎么叫</button>
+      <button class="chip" type="button" data-say="我要听儿歌">我要听儿歌</button>
+      <button class="chip" type="button" data-say="背一首古诗">背一首古诗</button>
+    </div>
+  </section>
+
+  <!-- ===== 儿歌乐园 ===== -->
+  <section class="page" id="page-song" role="tabpanel" aria-label="儿歌乐园">
+    <div class="grid" id="songGrid"></div>
+    <article class="stage" id="songStage" hidden>
+      <h2 class="stage-title" id="songTitle"></h2>
+      <div class="stage-body" id="songBody"></div>
+      <div class="stage-actions">
+        <button class="action" type="button" id="songReplay">再读一遍</button>
+      </div>
+    </article>
+  </section>
+
+  <!-- ===== 诗词课堂 ===== -->
+  <section class="page" id="page-poem" role="tabpanel" aria-label="诗词课堂">
+    <div class="grid" id="poemGrid"></div>
+    <article class="stage" id="poemStage" hidden>
+      <h2 class="stage-title" id="poemTitle"></h2>
+      <p class="stage-meta" id="poemMeta"></p>
+      <div class="stage-body poem-body" id="poemBody"></div>
+      <p class="stage-note" id="poemNote"></p>
+      <div class="stage-actions">
+        <button class="action" type="button" id="poemReplay">再读一遍</button>
+        <button class="action ghost" type="button" id="poemExplain">讲讲意思</button>
+      </div>
+    </article>
+  </section>
+
+  <!-- ===== 认知启蒙 ===== -->
+  <section class="page" id="page-learn" role="tabpanel" aria-label="认知启蒙">
+    <div class="chips cats" id="catChips" aria-label="分类"></div>
+    <div class="grid" id="cardGrid"></div>
+  </section>
+
+  <footer class="foot">
+    <p>点一下就出声 · 数据只存在本机浏览器 · 建议用平板横屏或电脑打开</p>
+  </footer>
+</main>
+
+<div class="confetti" id="confetti" aria-hidden="true"></div>
+
+<script src="assets/js/data.js" defer></script>
+<script src="assets/js/sound.js" defer></script>
+<script src="assets/js/app.js" defer></script>
+</body>
+</html>
