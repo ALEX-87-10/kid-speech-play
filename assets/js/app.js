@@ -409,15 +409,32 @@
     rec.onend = function () { setListening(false); };
   }
 
-  micBtn.addEventListener("click", function () {
-    if (S.unlock) S.unlock();
+  function startRec() {
     if (!rec) return;
-    if (listening) { rec.stop(); return; }
     S.play("tap");
     try {
       rec.start();
     } catch (e) {
       micHint.textContent = "刚才还在听，稍等一下再按";
+    }
+  }
+
+  micBtn.addEventListener("click", function () {
+    if (S.unlock) S.unlock();
+    if (V.unlock) V.unlock();
+    if (!rec) return;
+    if (listening) { rec.stop(); return; }
+    /* 先申请一次麦克风权限，让系统弹出授权框，也能提前暴露权限被拒的情况 */
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      navigator.mediaDevices.getUserMedia({ audio: true }).then(function (stream) {
+        stream.getTracks().forEach(function (t) { t.stop(); });
+        startRec();
+      }).catch(function () {
+        micHint.textContent = "麦克风被禁止了，请在浏览器的权限设置里打开麦克风";
+        S.play("nope");
+      });
+    } else {
+      startRec();
     }
   });
 
@@ -427,6 +444,25 @@
     if (S.unlock) S.unlock();
     if (V.unlock) V.unlock();
   }, { once: true });
+
+  /* 安卓 / 微信里读不出声时给一次明确提示，免得小朋友以为坏了 */
+  var silentShown = false;
+  if (V.onSilent) {
+    V.onSilent(function () {
+      if (silentShown) return;
+      silentShown = true;
+      bubble("bot", "这台设备没能读出声音。安卓手机请先安装「语音合成引擎」并下载中文语音包，再用 Chrome 或系统浏览器打开。");
+    });
+  }
+
+  if (/MicroMessenger/i.test(navigator.userAgent) && /Android/i.test(navigator.userAgent)) {
+    var tip = document.createElement("p");
+    tip.className = "kid-note";
+    tip.style.margin = "0 2px 12px";
+    tip.textContent = "微信里可能读不出声音，点右上角「…」选择「在浏览器打开」试试。";
+    var talkPage = document.getElementById("page-talk");
+    if (talkPage) talkPage.insertBefore(tip, talkPage.firstChild);
+  }
 
   if (!V.supported()) {
     bubble("bot", "这台设备的浏览器不能朗读语音，可以先看文字和卡片哦。");
