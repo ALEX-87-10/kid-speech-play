@@ -76,6 +76,7 @@
   var rate = 0.9;
   var zhVoice = null;
   var warmed = false;
+  var silentHook = null;
 
   function pickVoice() {
     if (!synth) return;
@@ -86,18 +87,25 @@
     zhVoice = null;
   }
 
-  /* 手机 / 平板上的语音引擎必须由一次用户手势唤醒，否则只出音效不出人声 */
+  /* 手机 / 平板：语音引擎必须在一次用户手势里唤醒，否则只有音效不出人声 */
+  var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
   function unlockVoice() {
     if (!synth) return;
     try { synth.resume(); } catch (e) {}
     if (warmed) return;
     warmed = true;
-    try {
-      var u = new SpeechSynthesisUtterance('。');
-      u.lang = 'zh-CN';
-      u.volume = 0;
-      synth.speak(u);
-    } catch (e) {}
+    /* iOS 必须真的送一句话进引擎才算解锁；Android 只要 resume 即可，
+       多发一条静音语句反而会占住引擎，导致后面读不出声 */
+    if (isIOS) {
+      try {
+        var u = new SpeechSynthesisUtterance('。');
+        u.lang = 'zh-CN';
+        u.volume = 0;
+        synth.speak(u);
+      } catch (e) {}
+    }
     pickVoice();
   }
 
@@ -111,6 +119,11 @@
   window.KidVoice = {
     supported: function () { return !!synth; },
     hasZhVoice: function () { return !!zhVoice; },
+    voiceCount: function () {
+      if (!synth) return 0;
+      return (synth.getVoices() || []).length;
+    },
+    onSilent: function (fn) { silentHook = fn; },
     isOn: function () { return voiceOn; },
     toggle: function () {
       voiceOn = !voiceOn;
@@ -156,7 +169,10 @@
         /* 移动端：引擎卡在暂停态时推一把；彻底没出声就不要一直卡着 */
         setTimeout(function () {
           try { if (synth.paused) synth.resume(); } catch (e) {}
-          if (!synth.speaking && !synth.pending) fire();
+          if (!synth.speaking && !synth.pending) {
+            fire();
+            if (typeof silentHook === 'function') silentHook();
+          }
         }, 900);
       };
 
