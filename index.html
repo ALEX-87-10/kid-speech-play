@@ -6,7 +6,8 @@
 <title>星星小屋 · 会说话的启蒙乐园</title>
 <meta name="description" content="面向幼儿园小朋友的语音互动启蒙网页：点读、儿歌、古诗、认知卡片，纯静态、无需登录。">
 <link rel="icon" type="image/svg+xml" href="assets/icon.svg">
-<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="assets/css/base.css">
+<link rel="stylesheet" href="assets/css/cards.css">
 </head>
 <body>
 <div class="sky" aria-hidden="true">
@@ -65,7 +66,6 @@
     </button>
   </nav>
 
-  <!-- ===== 语音对话 ===== -->
   <section class="page is-on" id="page-talk" role="tabpanel" aria-label="语音对话">
     <div class="talk-stage">
       <button class="mic" id="micBtn" type="button" aria-label="开始说话">
@@ -75,9 +75,7 @@
       </button>
       <p class="mic-hint" id="micHint">按一下，然后对我说句话</p>
     </div>
-
     <div class="chat" id="chat" aria-live="polite"></div>
-
     <div class="chips" aria-label="快捷提问">
       <button class="chip" type="button" data-say="你好">你好呀</button>
       <button class="chip" type="button" data-say="小猫怎么叫">小猫怎么叫</button>
@@ -86,7 +84,6 @@
     </div>
   </section>
 
-  <!-- ===== 儿歌乐园 ===== -->
   <section class="page" id="page-song" role="tabpanel" aria-label="儿歌乐园">
     <div class="grid" id="songGrid"></div>
     <article class="stage" id="songStage" hidden>
@@ -98,7 +95,6 @@
     </article>
   </section>
 
-  <!-- ===== 诗词课堂 ===== -->
   <section class="page" id="page-poem" role="tabpanel" aria-label="诗词课堂">
     <div class="grid" id="poemGrid"></div>
     <article class="stage" id="poemStage" hidden>
@@ -113,7 +109,6 @@
     </article>
   </section>
 
-  <!-- ===== 认知启蒙 ===== -->
   <section class="page" id="page-learn" role="tabpanel" aria-label="认知启蒙">
     <div class="chips cats" id="catChips" aria-label="分类"></div>
     <div class="grid" id="cardGrid"></div>
@@ -127,6 +122,7 @@
 <div class="confetti" id="confetti" aria-hidden="true"></div>
 
 <script src="assets/js/data.js" defer></script>
+<script src="assets/js/data-cards.js" defer></script>
 <script src="assets/js/sound.js" defer></script>
 <script src="assets/js/app.js" defer></script>
 </body>
